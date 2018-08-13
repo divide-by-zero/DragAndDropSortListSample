@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class Dropable : MonoBehaviour, IDropHandler
+public class Dropable : MonoBehaviour, IDropHandler, IPointerEnterHandler
 {
     public Action<Draggable> OnInsert;
     public Action<Draggable> OnRemove;
@@ -27,6 +27,15 @@ public class Dropable : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
+        var dragObj = eventData.pointerDrag.GetComponent<Draggable>();
+        if (dragObj == null) return;
+        dragObj?.Parent?.OnRemove(dragObj); //抜ける
+        OnInsert?.Invoke(dragObj);  //挿入する
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if(eventData.pointerDrag == null)return;
         var dragObj = eventData.pointerDrag.GetComponent<Draggable>();
         if (dragObj == null) return;
         dragObj?.Parent?.OnRemove(dragObj); //抜ける
